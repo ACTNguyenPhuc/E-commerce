@@ -1,0 +1,106 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  font-family:
+    Inter,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    "Helvetica Neue",
+    Arial,
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  background: #f4f7fb;
+  color: #2a3547;
+}
+
+html[data-theme="dark"] body {
+  background: #111c2d;
+  color: #e8eef5;
+}
+
+/* Top nav (HeaderBar) – rounded active pill like reference */
+.topNavMenu.ant-menu-horizontal {
+  line-height: 40px;
+}
+.topNavMenu.ant-menu-horizontal > .ant-menu-item {
+  border-radius: 999px;
+  margin: 0 6px;
+  padding: 0 14px;
+}
+.topNavMenu.ant-menu-horizontal > .ant-menu-item::after {
+  border-bottom: none !important;
+}
+.topNavMenu.ant-menu-horizontal > .ant-menu-item-selected {
+  background: rgba(52, 174, 255, 0.22) !important;
+  color: #5d87ff !important;
+  font-weight: 800;
+}
+.topNavMenu.ant-menu-horizontal > .ant-menu-item-selected .anticon {
+  color: #5d87ff !important;
+}
+
+html[data-theme="dark"] .topNavMenu.ant-menu-horizontal > .ant-menu-item-selected {
+  background: rgba(52, 174, 255, 0.22) !important;
+}
+
+/* Sider trigger: avoid blending with sider bg */
+html[data-theme="dark"] .ant-layout-sider-trigger .anticon.anticon-left svg {
+  fill: #e8eef5;
+}
+html[data-theme="light"] .ant-layout-sider-trigger .anticon.anticon-left svg {
+  fill: #2a3f5c;
+  font-weight: 900;
+}
+html[data-theme="light"] .ant-layout-sider-trigger .anticon.anticon-right svg {
+  fill: #2a3f5c;
+  font-weight: 900;
+}
+html[data-theme="dark"] .ant-layout-sider-trigger .anticon.anticon-right svg {
+  fill: #e8eef5;
+  font-weight: 900;
+}
+
+html[data-theme="dark"] .ant-layout-sider-trigger {
+  border-top-color: #2a3f5c;
+  font-weight: 900;
+}
+
+/* Rich editor (ReactQuill) */
+.productRichEditor .ql-toolbar.ql-snow {
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+.productRichEditor .ql-container.ql-snow {
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+  min-height: 180px;
+}
+.productRichEditor .ql-editor {
+  min-height: 160px;
+}
+
+/* Ensure editor content layout isn't broken by global styles */
+.productRichEditor .ql-editor img {
+  max-width: 100%;
+  height: auto;
+}
+.productRichEditor .ql-editor .ql-align-center {
+  text-align: center;
+}
+.productRichEditor .ql-editor .ql-align-right {
+  text-align: right;
+}

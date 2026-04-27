@@ -1,0 +1,89 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: ecommerce-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: ecommerce_db
+      MYSQL_USER: phucnv
+      MYSQL_PASSWORD: 1
+    ports:
+      - "3308:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    healthcheck:
+      test: ["CMD", "mysql", "-h", "localhost", "-uroot", "-proot", "ecommerce_db", "-e", "SELECT 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+    networks:
+      - ecommerce-net
+
+  backend:
+    build:
+      context: ./BackEnd
+    container_name: ecommerce-backend
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: ecommerce_db
+      DB_USER: root
+      DB_PASSWORD: root
+      JWT_SECRET: change-me-please-use-a-very-long-random-string-for-production-at-least-256-bits
+      ALLOWED_ORIGINS: http://localhost:5173
+      MAIL_HOST: mailhog
+      MAIL_PORT: 1025
+    ports:
+      - "8080:8080"
+    volumes:
+      - uploads:/app/uploads
+    networks:
+      - ecommerce-net
+
+  mailhog:
+    image: mailhog/mailhog
+    container_name: ecommerce-mailhog
+    restart: unless-stopped
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    networks:
+      - ecommerce-net
+
+  dashboard:
+    image: node:20-alpine
+    container_name: ecommerce-dashboard
+    working_dir: /app
+    restart: unless-stopped
+    depends_on:
+      - backend
+    environment:
+      VITE_PROXY_TARGET: http://backend:8080
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./FrontEnd/Dashboard:/app
+      - dashboard_node_modules:/app/node_modules
+    command: sh -lc "npm ci && npm run dev -- --host 0.0.0.0 --port 5173"
+    networks:
+      - ecommerce-net
+
+volumes:
+  mysql_data:
+  uploads:
+  dashboard_node_modules:
+
+networks:
+  ecommerce-net:
+    driver: bridge
+
