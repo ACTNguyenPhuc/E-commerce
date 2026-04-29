@@ -513,5 +513,216 @@ CREATE TABLE banners (
 SET FOREIGN_KEY_CHECKS = 1;
 
 -- =====================================================================
+-- 10. SEED DATA MẪU (đúng ràng buộc khóa ngoại)
+-- =====================================================================
+
+-- 10.1 users
+INSERT INTO users
+    (id, email, phone, password_hash, full_name, avatar_url, use_file_upload, gender, date_of_birth, role, status, email_verified_at, last_login_at)
+VALUES
+    (1, 'admin@shopco.vn', '0901000001', '$2b$12$admin.hash.example', 'System Admin', 'https://cdn.shopco.vn/users/admin.jpg', 0, 'other', '1990-01-01', 'admin', 'active', '2026-01-01 08:00:00', '2026-04-20 09:00:00'),
+    (2, 'staff.catalog@shopco.vn', '0901000002', '$2b$12$staff.hash.example', 'Catalog Staff', 'https://cdn.shopco.vn/users/staff.jpg', 0, 'female', '1995-06-12', 'staff', 'active', '2026-01-03 09:00:00', '2026-04-18 10:00:00'),
+    (3, 'nguyenvana@gmail.com', '0901000003', '$2b$12$customer1.hash', 'Nguyen Van A', 'https://cdn.shopco.vn/users/cus-a.jpg', 0, 'male', '1998-03-21', 'customer', 'active', '2026-02-01 10:00:00', '2026-04-22 11:00:00'),
+    (4, 'tranthib@gmail.com', '0901000004', '$2b$12$customer2.hash', 'Tran Thi B', 'https://cdn.shopco.vn/users/cus-b.jpg', 0, 'female', '2000-08-09', 'customer', 'active', '2026-02-10 09:00:00', '2026-04-21 14:00:00'),
+    (5, 'guestbuyer@gmail.com', '0901000005', '$2b$12$customer3.hash', 'Le Van C', NULL, 0, 'male', '1997-11-15', 'customer', 'inactive', NULL, NULL);
+
+-- 10.2 user_addresses
+INSERT INTO user_addresses
+    (id, user_id, recipient_name, recipient_phone, province, district, ward, street_address, address_type, is_default)
+VALUES
+    (1, 3, 'Nguyen Van A', '0901000003', 'Ho Chi Minh', 'Thu Duc', 'Linh Trung', '123 Vo Van Ngan', 'home', 1),
+    (2, 3, 'Nguyen Van A', '0901000003', 'Ho Chi Minh', 'Quan 1', 'Ben Nghe', '45 Le Loi', 'office', 0),
+    (3, 4, 'Tran Thi B', '0901000004', 'Ha Noi', 'Cau Giay', 'Dich Vong', '89 Tran Thai Tong', 'home', 1),
+    (4, 5, 'Le Van C', '0901000005', 'Da Nang', 'Hai Chau', 'Hai Chau 1', '12 Bach Dang', 'other', 1);
+
+-- 10.3 categories (self reference parent_id)
+INSERT INTO categories
+    (id, parent_id, name, slug, description, image_url, use_file_upload, display_order, status)
+VALUES
+    (1, NULL, 'Men', 'men', 'Men fashion category', 'https://cdn.shopco.vn/categories/men.jpg', 0, 1, 'active'),
+    (2, NULL, 'Women', 'women', 'Women fashion category', 'https://cdn.shopco.vn/categories/women.jpg', 0, 2, 'active'),
+    (3, NULL, 'Accessories', 'accessories', 'Accessories category', 'https://cdn.shopco.vn/categories/accessories.jpg', 0, 3, 'active'),
+    (4, 1, 'Men T-Shirts', 'men-tshirts', 'Men t-shirts', 'https://cdn.shopco.vn/categories/men-tshirts.jpg', 0, 1, 'active'),
+    (5, 2, 'Women Dresses', 'women-dresses', 'Women dresses', 'https://cdn.shopco.vn/categories/women-dresses.jpg', 0, 1, 'active'),
+    (6, 3, 'Shoes', 'shoes', 'Shoes and sneakers', 'https://cdn.shopco.vn/categories/shoes.jpg', 0, 1, 'active');
+
+-- 10.4 brands
+INSERT INTO brands
+    (id, name, slug, logo_url, use_file_upload, description, status)
+VALUES
+    (1, 'Nike', 'nike', 'https://cdn.shopco.vn/brands/nike.png', 0, 'Global sportswear brand', 'active'),
+    (2, 'Adidas', 'adidas', 'https://cdn.shopco.vn/brands/adidas.png', 0, 'Sports and lifestyle brand', 'active'),
+    (3, 'LocalBrand', 'localbrand', 'https://cdn.shopco.vn/brands/localbrand.png', 0, 'Vietnamese streetwear brand', 'active');
+
+-- 10.5 products
+INSERT INTO products
+    (id, category_id, brand_id, sku, name, slug, short_description, description, base_price, sale_price, thumbnail_url, use_file_upload, status, is_featured, view_count, sold_count, rating_avg, rating_count)
+VALUES
+    (1, 4, 1, 'PROD-TS-NIKE-001', 'Nike Basic Tee', 'nike-basic-tee', 'Soft cotton daily t-shirt', 'Comfortable regular fit t-shirt for everyday use.', 350000.00, 299000.00, 'https://cdn.shopco.vn/products/nike-tee-thumb.jpg', 0, 'active', 1, 320, 45, 4.50, 2),
+    (2, 5, 2, 'PROD-DR-ADI-001', 'Adidas Summer Dress', 'adidas-summer-dress', 'Lightweight summer dress', 'Breathable fabric dress with modern silhouette.', 890000.00, 790000.00, 'https://cdn.shopco.vn/products/adidas-dress-thumb.jpg', 0, 'active', 1, 220, 18, 5.00, 1),
+    (3, 6, 3, 'PROD-SH-LB-001', 'LocalBrand Sneaker X', 'localbrand-sneaker-x', 'Unisex street sneaker', 'Chunky sole sneaker designed for daily movement.', 1200000.00, NULL, 'https://cdn.shopco.vn/products/lb-sneaker-thumb.jpg', 0, 'active', 0, 150, 9, 0.00, 0);
+
+-- 10.6 product_images
+INSERT INTO product_images
+    (id, product_id, image_url, use_file_upload, alt_text, display_order, is_primary)
+VALUES
+    (1, 1, 'https://cdn.shopco.vn/products/nike-tee-1.jpg', 0, 'Nike Basic Tee Front', 1, 1),
+    (2, 1, 'https://cdn.shopco.vn/products/nike-tee-2.jpg', 0, 'Nike Basic Tee Back', 2, 0),
+    (3, 2, 'https://cdn.shopco.vn/products/adidas-dress-1.jpg', 0, 'Adidas Dress Front', 1, 1),
+    (4, 2, 'https://cdn.shopco.vn/products/adidas-dress-2.jpg', 0, 'Adidas Dress Detail', 2, 0),
+    (5, 3, 'https://cdn.shopco.vn/products/lb-sneaker-1.jpg', 0, 'Sneaker Side', 1, 1);
+
+-- 10.7 product_attributes
+INSERT INTO product_attributes
+    (id, name, slug)
+VALUES
+    (1, 'Color', 'color'),
+    (2, 'Size', 'size');
+
+-- 10.8 product_attribute_values
+INSERT INTO product_attribute_values
+    (id, attribute_id, value, color_code, display_order)
+VALUES
+    (1, 1, 'Black', '#000000', 1),
+    (2, 1, 'White', '#FFFFFF', 2),
+    (3, 1, 'Red', '#FF3333', 3),
+    (4, 2, 'S', NULL, 1),
+    (5, 2, 'M', NULL, 2),
+    (6, 2, 'L', NULL, 3),
+    (7, 2, '42', NULL, 4),
+    (8, 2, '43', NULL, 5);
+
+-- 10.9 product_variants
+INSERT INTO product_variants
+    (id, product_id, sku, price, sale_price, stock_quantity, image_url, use_file_upload, weight_gram, status)
+VALUES
+    (1, 1, 'VAR-TS-NIKE-BLK-M', 350000.00, 299000.00, 50, 'https://cdn.shopco.vn/products/nike-tee-black.jpg', 0, 220.00, 'active'),
+    (2, 1, 'VAR-TS-NIKE-WHT-L', 350000.00, 305000.00, 32, 'https://cdn.shopco.vn/products/nike-tee-white.jpg', 0, 230.00, 'active'),
+    (3, 2, 'VAR-DR-ADI-RED-S', 890000.00, 790000.00, 20, 'https://cdn.shopco.vn/products/adidas-dress-red.jpg', 0, 380.00, 'active'),
+    (4, 3, 'VAR-SH-LB-BLK-42', 1200000.00, NULL, 15, 'https://cdn.shopco.vn/products/lb-sneaker-black.jpg', 0, 760.00, 'active'),
+    (5, 3, 'VAR-SH-LB-WHT-43', 1200000.00, NULL, 12, 'https://cdn.shopco.vn/products/lb-sneaker-white.jpg', 0, 770.00, 'active');
+
+-- 10.10 product_variant_values (N-N)
+INSERT INTO product_variant_values
+    (variant_id, attribute_value_id)
+VALUES
+    (1, 1), (1, 5), -- Black, M
+    (2, 2), (2, 6), -- White, L
+    (3, 3), (3, 4), -- Red, S
+    (4, 1), (4, 7), -- Black, 42
+    (5, 2), (5, 8); -- White, 43
+
+-- 10.11 carts
+INSERT INTO carts
+    (id, user_id, session_id, status)
+VALUES
+    (1, 3, NULL, 'active'),
+    (2, NULL, 'guest-20260429-abc123', 'active'),
+    (3, 4, NULL, 'converted');
+
+-- 10.12 cart_items
+INSERT INTO cart_items
+    (id, cart_id, product_id, variant_id, quantity, unit_price)
+VALUES
+    (1, 1, 1, 1, 2, 299000.00),
+    (2, 1, 3, 4, 1, 1200000.00),
+    (3, 2, 2, 3, 1, 790000.00),
+    (4, 3, 1, 2, 1, 305000.00);
+
+-- 10.13 vouchers
+INSERT INTO vouchers
+    (id, code, name, description, discount_type, discount_value, min_order_amount, max_discount_amount, usage_limit, usage_limit_per_user, used_count, start_date, end_date, status)
+VALUES
+    (1, 'WELCOME10', 'Welcome 10%', 'Discount 10% for first purchases', 'percentage', 10.00, 500000.00, 100000.00, 1000, 1, 1, '2026-01-01 00:00:00', '2026-12-31 23:59:59', 'active'),
+    (2, 'FREESHIP50', 'Shipping support 50K', 'Fixed discount for shipping support', 'fixed_amount', 50000.00, 300000.00, NULL, 5000, 3, 0, '2026-01-01 00:00:00', '2026-12-31 23:59:59', 'active'),
+    (3, 'SPRINGSALE', 'Spring campaign', 'Seasonal promotion', 'percentage', 15.00, 1000000.00, 200000.00, 300, 2, 0, '2026-03-01 00:00:00', '2026-05-31 23:59:59', 'active');
+
+-- 10.14 shipping_methods
+INSERT INTO shipping_methods
+    (id, code, name, description, base_fee, estimated_days_min, estimated_days_max, status)
+VALUES
+    (1, 'STANDARD', 'Standard Delivery', 'Delivery via standard route', 30000.00, 3, 5, 'active'),
+    (2, 'EXPRESS', 'Express Delivery', 'Fast delivery in major cities', 50000.00, 1, 2, 'active'),
+    (3, 'SAME_DAY', 'Same Day Delivery', 'Inner-city same day service', 70000.00, 0, 1, 'inactive');
+
+-- 10.15 orders
+INSERT INTO orders
+    (id, order_code, user_id, voucher_id, shipping_method_id, recipient_name, recipient_phone, shipping_address, subtotal, shipping_fee, discount_amount, total_amount, payment_method, payment_status, status, note, placed_at, confirmed_at, delivered_at, cancelled_at)
+VALUES
+    (1, 'ORD-20260401-0001', 3, 1, 1, 'Nguyen Van A', '0901000003', '123 Vo Van Ngan, Linh Trung, Thu Duc, Ho Chi Minh', 1804000.00, 30000.00, 100000.00, 1734000.00, 'vnpay', 'paid', 'delivered', 'Leave at front desk', '2026-04-01 08:45:00', '2026-04-01 09:00:00', '2026-04-04 16:30:00', NULL),
+    (2, 'ORD-20260410-0002', 4, NULL, 2, 'Tran Thi B', '0901000004', '89 Tran Thai Tong, Dich Vong, Cau Giay, Ha Noi', 790000.00, 50000.00, 0.00, 840000.00, 'cod', 'pending', 'shipping', 'Call before delivery', '2026-04-10 11:20:00', '2026-04-10 11:45:00', NULL, NULL),
+    (3, 'ORD-20260415-0003', 3, NULL, 1, 'Nguyen Van A', '0901000003', '45 Le Loi, Ben Nghe, Quan 1, Ho Chi Minh', 305000.00, 30000.00, 0.00, 335000.00, 'momo', 'failed', 'cancelled', 'Payment timeout', '2026-04-15 14:10:00', NULL, NULL, '2026-04-15 14:30:00');
+
+-- 10.16 order_items
+INSERT INTO order_items
+    (id, order_id, product_id, variant_id, product_name, variant_name, sku, unit_price, quantity, subtotal)
+VALUES
+    (1, 1, 1, 1, 'Nike Basic Tee', 'Black / M', 'VAR-TS-NIKE-BLK-M', 299000.00, 1, 299000.00),
+    (2, 1, 3, 4, 'LocalBrand Sneaker X', 'Black / 42', 'VAR-SH-LB-BLK-42', 1200000.00, 1, 1200000.00),
+    (3, 1, 1, 2, 'Nike Basic Tee', 'White / L', 'VAR-TS-NIKE-WHT-L', 305000.00, 1, 305000.00),
+    (4, 2, 2, 3, 'Adidas Summer Dress', 'Red / S', 'VAR-DR-ADI-RED-S', 790000.00, 1, 790000.00),
+    (5, 3, 1, 2, 'Nike Basic Tee', 'White / L', 'VAR-TS-NIKE-WHT-L', 305000.00, 1, 305000.00);
+
+-- 10.17 order_status_history
+INSERT INTO order_status_history
+    (id, order_id, from_status, to_status, note, changed_by, created_at)
+VALUES
+    (1, 1, NULL, 'pending', 'Order created', 3, '2026-04-01 08:45:00'),
+    (2, 1, 'pending', 'confirmed', 'Staff confirmed stock', 2, '2026-04-01 09:00:00'),
+    (3, 1, 'confirmed', 'shipping', 'Handed to carrier', 2, '2026-04-02 10:00:00'),
+    (4, 1, 'shipping', 'delivered', 'Delivered successfully', 2, '2026-04-04 16:30:00'),
+    (5, 2, NULL, 'pending', 'Order created', 4, '2026-04-10 11:20:00'),
+    (6, 2, 'pending', 'confirmed', 'Order confirmed', 2, '2026-04-10 11:45:00'),
+    (7, 2, 'confirmed', 'shipping', 'Courier picked up', 2, '2026-04-11 09:00:00'),
+    (8, 3, NULL, 'pending', 'Order created', 3, '2026-04-15 14:10:00'),
+    (9, 3, 'pending', 'cancelled', 'Payment failed', 3, '2026-04-15 14:30:00');
+
+-- 10.18 payments
+INSERT INTO payments
+    (id, order_id, payment_method, amount, transaction_code, status, gateway_response, paid_at)
+VALUES
+    (1, 1, 'vnpay', 1734000.00, 'VNPAY-TRX-20260401-001', 'success', '{"bank":"VCB","code":"00"}', '2026-04-01 08:47:00'),
+    (2, 2, 'cod', 840000.00, NULL, 'pending', NULL, NULL),
+    (3, 3, 'momo', 335000.00, 'MOMO-TRX-20260415-001', 'failed', '{"message":"timeout"}', NULL);
+
+-- 10.19 shipments
+INSERT INTO shipments
+    (id, order_id, shipping_method_id, tracking_number, carrier, status, shipping_fee, shipped_at, delivered_at, note)
+VALUES
+    (1, 1, 1, 'GHN123456789', 'GHN', 'delivered', 30000.00, '2026-04-02 10:15:00', '2026-04-04 16:30:00', 'Delivered to recipient'),
+    (2, 2, 2, 'GHTK987654321', 'GHTK', 'in_transit', 50000.00, '2026-04-11 09:00:00', NULL, 'On route to destination'),
+    (3, 3, 1, NULL, NULL, 'failed', 30000.00, NULL, NULL, 'Order cancelled before shipment');
+
+-- 10.20 reviews
+INSERT INTO reviews
+    (id, product_id, user_id, order_item_id, rating, title, content, status, helpful_count)
+VALUES
+    (1, 1, 3, 1, 5, 'Ao mac rat thoai mai', 'Chat vai mem, dung size, giao nhanh.', 'approved', 4),
+    (2, 3, 3, 2, 4, 'Giay dep', 'Form dep, de di, se ung ho tiep.', 'approved', 2),
+    (3, 2, 4, 4, 5, 'Vay dep', 'Mau dep, chat lieu on.', 'pending', 0);
+
+-- 10.21 voucher_usages
+INSERT INTO voucher_usages
+    (id, voucher_id, user_id, order_id, discount_amount, used_at)
+VALUES
+    (1, 1, 3, 1, 100000.00, '2026-04-01 08:46:00');
+
+-- 10.22 wishlists
+INSERT INTO wishlists
+    (id, user_id, product_id)
+VALUES
+    (1, 3, 2),
+    (2, 3, 3),
+    (3, 4, 1);
+
+-- 10.23 banners
+INSERT INTO banners
+    (id, title, subtitle, image_url, use_file_upload, link_url, display_order, status, start_at, end_at)
+VALUES
+    (1, 'Summer Sale 2026', 'Up to 50% for selected items', 'https://cdn.shopco.vn/banners/summer-sale-2026.jpg', 0, '/catalog?sale=true', 1, 'active', '2026-04-01 00:00:00', '2026-06-30 23:59:59'),
+    (2, 'New Arrival', 'Latest collection just landed', 'https://cdn.shopco.vn/banners/new-arrival-2026.jpg', 0, '/catalog?sort=new', 2, 'active', '2026-04-10 00:00:00', '2026-12-31 23:59:59'),
+    (3, 'Member Day', 'Voucher for loyal customers', 'https://cdn.shopco.vn/banners/member-day.jpg', 0, '/account/vouchers', 3, 'inactive', '2026-05-01 00:00:00', '2026-05-31 23:59:59');
+
+-- =====================================================================
 -- KẾT THÚC SCHEMA
 -- =====================================================================

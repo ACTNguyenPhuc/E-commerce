@@ -860,7 +860,7 @@ export function ProductFormPage() {
                               <Space direction="vertical" style={{ width: "100%" }} size={6}>
                                 <Space style={{ width: "100%", justifyContent: "space-between" }}>
                                   {img.isPrimary ? (
-                                    <Tag color="magenta" style={{ borderRadius: 999 }}>
+                                    <Tag color="green" style={{ borderRadius: 999 }}>
                                       Primary
                                     </Tag>
                                   ) : (

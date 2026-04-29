@@ -17,6 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -41,6 +43,33 @@ public class CategoryService {
                         byParent.getOrDefault(parent.getId(), List.of()).stream()
                                 .map(CategoryResponse::from).toList()))
                 .toList();
+    }
+
+    /**
+     * Collect categoryId + all active descendants (recursive via parent_id).
+     * Used to filter products by category including subcategories.
+     */
+    @Transactional(readOnly = true)
+    public List<Long> collectDescendantIds(Long categoryId) {
+        if (categoryId == null) return null;
+
+        List<Category> all = repo.findByStatusOrderByDisplayOrderAscIdAsc(CommonStatus.active);
+        Map<Long, List<Category>> byParent = all.stream()
+                .filter(c -> c.getParentId() != null)
+                .collect(Collectors.groupingBy(Category::getParentId));
+
+        List<Long> result = new java.util.ArrayList<>();
+        Deque<Long> stack = new ArrayDeque<>();
+        stack.push(categoryId);
+
+        while (!stack.isEmpty()) {
+            Long cur = stack.pop();
+            result.add(cur);
+            for (Category child : byParent.getOrDefault(cur, List.of())) {
+                if (child.getId() != null) stack.push(child.getId());
+            }
+        }
+        return result;
     }
 
     @Transactional(readOnly = true)

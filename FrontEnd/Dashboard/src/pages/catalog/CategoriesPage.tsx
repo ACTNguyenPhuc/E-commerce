@@ -132,6 +132,7 @@ export function CategoriesPage() {
     <>
       <PageHeader
         title="Danh mục"
+        description="Cây danh mục sản phẩm. Tạo / sửa / xoá chỉ dành cho admin."
         extra={
           <PermissionGate roles={["admin"]}>
             <Button type="primary" onClick={openCreate}>

@@ -70,12 +70,14 @@ public class SecurityConfig {
                                 "/v1/categories/**",
                                 "/v1/brands/**",
                                 "/v1/products/**",
+                                "/v1/banners/**",
                                 "/v1/search",
                                 "/v1/shipping/methods",
                                 "/uploads/**",
                                 "/v1/files/**"
                         ).permitAll()
                         .requestMatchers("/v1/cart/**").permitAll() // hỗ trợ guest qua X-Session-Id
+                        .requestMatchers(HttpMethod.POST, "/v1/vouchers/validate").permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .requestMatchers("/actuator/health", "/actuator/info").permitAll()
                         .requestMatchers("/v1/admin/**").hasAnyRole("ADMIN", "STAFF")

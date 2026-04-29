@@ -28,6 +28,7 @@
 | Database | **MySQL** | 8.0+ |
 | Database migration | **Flyway** | 10.x |
 | Bảo mật | **Spring Security + JWT** (`jjwt` 0.12.x) | – |
+| Builder            | **Lombok** (`@Builder`, `@Data`, `@AllArgsConstructor`) | 1.18.x          |
 | Mapping DTO | **MapStruct** | 1.5.x |
 | Validation | `jakarta.validation` (Hibernate Validator) | – |
 | Documentation | **springdoc-openapi** (Swagger UI) | 2.x |
@@ -142,7 +143,7 @@ BackEnd/
 
 ### 6.1. Chiến lược
 
-- **JWT Bearer Token**: 
+- **JWT Bearer Token**: Lưu ở Memory / headerCookie httpOnly
   - `accessToken` – TTL 15 phút
   - `refreshToken` – TTL 7 ngày, lưu hash trong Redis (hoặc DB) để có thể revoke.
 - **Stateless** – không dùng session HTTP.
@@ -709,4 +710,4 @@ Coverage mục tiêu: **>= 70%** cho service layer.
 
 ---
 
-> Tài liệu này là **kim chỉ nam** cho team backend. Mọi thay đổi schema phải đi kèm migration Flyway và cập nhật module tương ứng. Mọi endpoint mới phải bổ sung Swagger + test.
+> Tài liệu này là **kim chỉ nam** cho team backend. Mọi thay đổi schema phải đi kèm migration Flyway và cập nhật module tương ứng. Mọi endpoint mới phải bổ sung Swagger + test. Mọi endpoint mới phải bổ sung Swagger + test.

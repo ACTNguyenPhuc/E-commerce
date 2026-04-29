@@ -9,9 +9,16 @@ import com.ecommerce.modules.cart.entity.CartItem;
 import com.ecommerce.modules.cart.entity.CartStatus;
 import com.ecommerce.modules.cart.repository.CartItemRepository;
 import com.ecommerce.modules.cart.repository.CartRepository;
+import com.ecommerce.modules.catalog.dto.AttributeValueResponse;
 import com.ecommerce.modules.catalog.entity.Product;
+import com.ecommerce.modules.catalog.entity.ProductAttribute;
+import com.ecommerce.modules.catalog.entity.ProductAttributeValue;
+import com.ecommerce.modules.catalog.entity.ProductVariantValue;
 import com.ecommerce.modules.catalog.entity.ProductVariant;
+import com.ecommerce.modules.catalog.repository.ProductAttributeRepository;
+import com.ecommerce.modules.catalog.repository.ProductAttributeValueRepository;
 import com.ecommerce.modules.catalog.repository.ProductRepository;
+import com.ecommerce.modules.catalog.repository.ProductVariantValueRepository;
 import com.ecommerce.modules.catalog.repository.ProductVariantRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,6 +27,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +39,35 @@ public class CartService {
     private final CartItemRepository cartItemRepo;
     private final ProductRepository productRepo;
     private final ProductVariantRepository variantRepo;
+    private final ProductVariantValueRepository pvvRepo;
+    private final ProductAttributeValueRepository attrValueRepo;
+    private final ProductAttributeRepository attrRepo;
+
+    private List<AttributeValueResponse> loadVariantAttributes(Long variantId, Map<Long, String> attrNameMap) {
+        if (variantId == null) return List.of();
+
+        List<ProductVariantValue> pvvs = pvvRepo.findByVariantId(variantId);
+        if (pvvs == null || pvvs.isEmpty()) return List.of();
+
+        List<Long> avIds = pvvs.stream()
+                .map(ProductVariantValue::getAttributeValueId)
+                .filter(Objects::nonNull)
+                .distinct()
+                .toList();
+
+        Map<Long, ProductAttributeValue> avMap = avIds.isEmpty() ? Map.of()
+                : attrValueRepo.findByIdIn(avIds).stream()
+                .collect(Collectors.toMap(ProductAttributeValue::getId, x -> x));
+
+        return pvvs.stream()
+                .map(pvv -> {
+                    ProductAttributeValue av = avMap.get(pvv.getAttributeValueId());
+                    if (av == null) return null;
+                    return AttributeValueResponse.from(av, attrNameMap.get(av.getAttributeId()));
+                })
+                .filter(Objects::nonNull)
+                .toList();
+    }
 
     @Transactional
     public CartResponse getOrCreate(Long userId, String sessionId) {
@@ -169,6 +208,8 @@ public class CartService {
         BigDecimal subtotal = BigDecimal.ZERO;
         int totalQty = 0;
         List<CartItemResponse> itemResponses = new java.util.ArrayList<>();
+        Map<Long, String> attrNameMap = attrRepo.findAll().stream()
+                .collect(Collectors.toMap(ProductAttribute::getId, ProductAttribute::getName));
         for (CartItem it : items) {
             BigDecimal lineTotal = it.getUnitPrice().multiply(BigDecimal.valueOf(it.getQuantity()));
             subtotal = subtotal.add(lineTotal);
@@ -176,12 +217,15 @@ public class CartService {
             Product p = productRepo.findById(it.getProductId()).orElse(null);
             ProductVariant v = it.getVariantId() != null ? variantRepo.findById(it.getVariantId()).orElse(null) : null;
             boolean thumbFromVariant = v != null && v.getImageUrl() != null;
+
+            List<AttributeValueResponse> attrs = loadVariantAttributes(it.getVariantId(), attrNameMap);
             itemResponses.add(CartItemResponse.builder()
                     .id(it.getId())
                     .productId(it.getProductId())
                     .variantId(it.getVariantId())
                     .productName(p != null ? p.getName() : null)
                     .variantName(v != null ? v.getSku() : null)
+                    .attributes(attrs)
                     .thumbnailUrl(thumbFromVariant ? v.getImageUrl()
                             : (p != null ? p.getThumbnailUrl() : null))
                     .useFileUpload(thumbFromVariant ? v.getUseFileUpload() : (p != null ? p.getUseFileUpload() : null))

@@ -11,6 +11,7 @@ import com.ecommerce.modules.catalog.dto.*;
 import com.ecommerce.modules.catalog.entity.*;
 import com.ecommerce.modules.catalog.repository.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -23,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ProductService {
@@ -31,6 +33,7 @@ public class ProductService {
     private static final String FOLDER_VARIANT = "variants";
 
     private final ProductRepository productRepo;
+    private final CategoryService categoryService;
     private final ProductImageRepository imageRepo;
     private final ProductVariantRepository variantRepo;
     private final ProductVariantValueRepository pvvRepo;
@@ -41,7 +44,9 @@ public class ProductService {
     @Transactional(readOnly = true)
     public PageResponse<ProductResponse> search(Long categoryId, Long brandId, String keyword,
                                                 BigDecimal minPrice, BigDecimal maxPrice, Pageable pageable) {
-        Page<Product> page = productRepo.search(ProductStatus.active, categoryId, brandId, keyword, minPrice, maxPrice, pageable);
+        List<Long> categoryIds = categoryId != null ? categoryService.collectDescendantIds(categoryId) : null;
+        if (categoryIds != null && categoryIds.isEmpty()) categoryIds = null;
+        Page<Product> page = productRepo.searchByCategoryIds(ProductStatus.active, categoryIds, brandId, keyword, minPrice, maxPrice, pageable);
         return PageResponse.from(page, ProductResponse::from);
     }
 
@@ -49,7 +54,9 @@ public class ProductService {
     public PageResponse<ProductResponse> adminSearch(ProductStatus status,
                                                      Long categoryId, Long brandId, String keyword,
                                                      BigDecimal minPrice, BigDecimal maxPrice, Pageable pageable) {
-        Page<Product> page = productRepo.adminSearch(status, categoryId, brandId, keyword, minPrice, maxPrice, pageable);
+        List<Long> categoryIds = categoryId != null ? categoryService.collectDescendantIds(categoryId) : null;
+        if (categoryIds != null && categoryIds.isEmpty()) categoryIds = null;
+        Page<Product> page = productRepo.adminSearchByCategoryIds(status, categoryIds, brandId, keyword, minPrice, maxPrice, pageable);
         return PageResponse.from(page, ProductResponse::from);
     }
 
@@ -137,6 +144,9 @@ public class ProductService {
         p.setName(req.name());
         if (req.slug() != null && !req.slug().isBlank()) p.setSlug(req.slug());
         p.setShortDescription(req.shortDescription());
+        log.info(req.description());
+        log.info("Description"+HtmlSanitizer.sanitize((req.description())));
+
         p.setDescription(HtmlSanitizer.sanitize(req.description()));
         p.setBasePrice(req.basePrice());
         p.setSalePrice(req.salePrice());

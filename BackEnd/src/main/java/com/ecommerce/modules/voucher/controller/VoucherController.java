@@ -28,10 +28,10 @@ public class VoucherController {
     }
 
     @PostMapping("/v1/vouchers/validate")
-    @PreAuthorize("isAuthenticated()")
     public ApiResponse<VoucherValidationResult> validate(@AuthenticationPrincipal UserPrincipal me,
                                                           @Valid @RequestBody ValidateVoucherRequest req) {
-        return ApiResponse.ok(voucherService.validate(me.getId(), req));
+        Long userId = me != null ? me.getId() : null;
+        return ApiResponse.ok(voucherService.validate(userId, req));
     }
 
     // -------- ADMIN --------

@@ -4,6 +4,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.safety.Safelist;
 
 public final class HtmlSanitizer {
+    private static final String SANITIZER_BASE_URI = "https://sanitizer.local";
 
     private static final Safelist SAFE = Safelist.relaxed()
             .addTags("h1", "h2", "h3", "h4", "h5", "h6")
@@ -24,7 +25,7 @@ public final class HtmlSanitizer {
 
     public static String sanitize(String html) {
         if (html == null) return null;
-        return Jsoup.clean(html, SAFE);
+        return Jsoup.clean(html, SANITIZER_BASE_URI, SAFE);
     }
 }
 

@@ -246,7 +246,7 @@ FrontEnd/Dashboard/
 | Loại state | Lưu ở đâu | Ví dụ |
 |---|---|---|
 | **Server state** (data từ API) | TanStack Query cache | products, orders, users |
-| **Auth** | Zustand `authStore` + localStorage | accessToken, currentUser |
+| **Auth** | Zustand `authStore` + cookieHttp | accessToken, currentUser |
 | **UI** | Zustand `uiStore` | sidebar collapsed, theme, locale |
 | **Form** | React Hook Form local | edit product, voucher |
 | **URL** | React Router search params | filter status, page, q |
@@ -325,7 +325,7 @@ FrontEnd/Dashboard/
 ## 6. Design System
 
 ### 6.1. Màu sắc
-
+Tạo một hệ thống quản lý design tokens tập trung cho dự án React + TypeScript + Ant Design + TailwindCSS, bao gồm toàn bộ màu sắc, typography, spacing, shadow và border radius. Yêu cầu chi tiết như sau:
 | Role | Hex | Dùng cho |
 |---|---|---|
 | Primary | `#1677ff` (AntD blue) | nút chính, link |

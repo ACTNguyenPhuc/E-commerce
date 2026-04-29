@@ -54,6 +54,42 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
                               @Param("maxPrice") BigDecimal maxPrice,
                               Pageable pageable);
 
+    @Query("""
+            SELECT p FROM Product p
+            WHERE p.status = :status
+              AND (:categoryIds IS NULL OR p.categoryId IN :categoryIds)
+              AND (:brandId    IS NULL OR p.brandId = :brandId)
+              AND (:keyword    IS NULL OR LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
+              )
+              AND (:minPrice   IS NULL OR COALESCE(p.salePrice, p.basePrice) >= :minPrice)
+              AND (:maxPrice   IS NULL OR COALESCE(p.salePrice, p.basePrice) <= :maxPrice)
+            """)
+    Page<Product> searchByCategoryIds(@Param("status") ProductStatus status,
+                                        @Param("categoryIds") List<Long> categoryIds,
+                                        @Param("brandId") Long brandId,
+                                        @Param("keyword") String keyword,
+                                        @Param("minPrice") BigDecimal minPrice,
+                                        @Param("maxPrice") BigDecimal maxPrice,
+                                        Pageable pageable);
+
+    @Query("""
+            SELECT p FROM Product p
+            WHERE (:status IS NULL OR p.status = :status)
+              AND (:categoryIds IS NULL OR p.categoryId IN :categoryIds)
+              AND (:brandId    IS NULL OR p.brandId = :brandId)
+              AND (:keyword    IS NULL OR LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
+                  OR LOWER(p.sku) LIKE LOWER(CONCAT('%', :keyword, '%')))
+              AND (:minPrice   IS NULL OR COALESCE(p.salePrice, p.basePrice) >= :minPrice)
+              AND (:maxPrice   IS NULL OR COALESCE(p.salePrice, p.basePrice) <= :maxPrice)
+            """)
+    Page<Product> adminSearchByCategoryIds(@Param("status") ProductStatus status,
+                                             @Param("categoryIds") List<Long> categoryIds,
+                                             @Param("brandId") Long brandId,
+                                             @Param("keyword") String keyword,
+                                             @Param("minPrice") BigDecimal minPrice,
+                                             @Param("maxPrice") BigDecimal maxPrice,
+                                             Pageable pageable);
+
     @Modifying
     @Query("UPDATE Product p SET p.viewCount = p.viewCount + 1 WHERE p.id = :id")
     void incrementViewCount(@Param("id") Long id);
