@@ -31,13 +31,27 @@ public record OrderDetailResponse(
 ) {
     @Builder
     public record Item(Long id, Long productId, Long variantId, String productName,
-                       String variantName, String sku, BigDecimal unitPrice,
+                       String variantName, String sku, String thumbnailUrl,
+                       Boolean useFileUpload,
+                       BigDecimal unitPrice,
                        Integer quantity, BigDecimal subtotal) {
         public static Item from(OrderItem oi) {
             return Item.builder()
                     .id(oi.getId()).productId(oi.getProductId()).variantId(oi.getVariantId())
                     .productName(oi.getProductName()).variantName(oi.getVariantName())
                     .sku(oi.getSku()).unitPrice(oi.getUnitPrice())
+                    .quantity(oi.getQuantity()).subtotal(oi.getSubtotal())
+                    .build();
+        }
+
+        public static Item from(OrderItem oi, String thumbnailUrl, Boolean useFileUpload) {
+            return Item.builder()
+                    .id(oi.getId()).productId(oi.getProductId()).variantId(oi.getVariantId())
+                    .productName(oi.getProductName()).variantName(oi.getVariantName())
+                    .sku(oi.getSku())
+                    .thumbnailUrl(thumbnailUrl)
+                    .useFileUpload(useFileUpload)
+                    .unitPrice(oi.getUnitPrice())
                     .quantity(oi.getQuantity()).subtotal(oi.getSubtotal())
                     .build();
         }

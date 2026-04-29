@@ -23,7 +23,7 @@ public class Banner extends BaseEntity {
     @Column(length = 200)
     private String title;
 
-    @Column(length = 255)
+    @Column(length = 2048)
     private String subtitle;
 
     @Column(name = "image_url", nullable = false, length = 2048)

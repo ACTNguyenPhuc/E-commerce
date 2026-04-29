@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
  */
 public record BannerRequest(
         @Size(max = 200) String title,
-        @Size(max = 255) String subtitle,
+        @Size(max = 2048) String subtitle,
         @Size(max = 2048) String imageUrl,
         Boolean useFileUpload,
         @Size(max = 2048) String linkUrl,

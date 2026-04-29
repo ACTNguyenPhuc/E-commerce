@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { App, Button, Card, Form, Input, InputNumber, Modal, Popconfirm, Select, Space, Switch, Table, Tag } from "antd";
+import { App, Button, Card, Form, Input, InputNumber, Modal, Popconfirm, Select, Space, Table, Tag } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import { bannerApi } from "@/api/banner.api";
 import type { Banner, BannerRequest, CommonStatus } from "@/types/banner";
@@ -108,8 +108,8 @@ export function BannersPage() {
           pagination={false}
           columns={[
             { title: "#", dataIndex: "id", width: 70 },
-            { title: "Title", dataIndex: "title", render: (v: string | null) => v ?? "—" },
-            { title: "Subtitle", dataIndex: "subtitle", render: (v: string | null) => v ?? "—" },
+            { title: "Title",  dataIndex: "title", render: (v: string | null) => v ?? "—" },
+            { title: "Subtitle",  dataIndex: "subtitle", render: (v: string | null) => v ?? "—" },
             { title: "Order", dataIndex: "displayOrder", width: 90 },
             {
               title: "Status",
@@ -179,11 +179,16 @@ export function BannersPage() {
             <Form.Item name="title" label="Title" style={{ flex: "1 1 280px" }}>
               <Input placeholder="Summer sale" />
             </Form.Item>
-            <Form.Item name="subtitle" label="Subtitle" style={{ flex: "1 1 320px" }}>
-              <Input placeholder="Up to 50% off" />
-            </Form.Item>
+            
           </Space>
-
+          <Form.Item name="subtitle" label="Subtitle" style={{ display: "block" }}>
+              <Input.TextArea
+                placeholder="Up to 50% off (có thể dán JSON config cho Home hero)"
+                autoSize={{ minRows: 4, maxRows: 10 }}
+                showCount
+                maxLength={2048}
+              />
+            </Form.Item>
           <Form.Item label="Image">
             <FileOrUrlImageInput
               value={{

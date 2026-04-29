@@ -9,7 +9,7 @@ public record AddressRequest(
         @NotBlank @Size(max = 100) String recipientName,
         @NotBlank @Pattern(regexp = "^(0[0-9]{9})$") String recipientPhone,
         @NotBlank @Size(max = 100) String province,
-        @NotBlank @Size(max = 100) String district,
+        @Size(max = 100) String district,
         @NotBlank @Size(max = 100) String ward,
         @NotBlank @Size(max = 255) String streetAddress,
         AddressType addressType,

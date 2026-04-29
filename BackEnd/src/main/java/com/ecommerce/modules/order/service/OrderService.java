@@ -242,8 +242,15 @@ public class OrderService {
                 ? orderRepo.findByOrderCode(orderCode).orElseThrow(() -> new ResourceNotFoundException("Order " + orderCode))
                 : orderRepo.findByOrderCodeAndUserId(orderCode, userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order " + orderCode));
-        List<OrderDetailResponse.Item> items = orderItemRepo.findByOrderId(o.getId())
-                .stream().map(OrderDetailResponse.Item::from).toList();
+        List<OrderDetailResponse.Item> items = new ArrayList<>();
+        for (OrderItem oi : orderItemRepo.findByOrderId(o.getId())) {
+            Product p = productRepo.findById(oi.getProductId()).orElse(null);
+            ProductVariant v = oi.getVariantId() != null ? variantRepo.findById(oi.getVariantId()).orElse(null) : null;
+            boolean thumbFromVariant = v != null && v.getImageUrl() != null;
+            String thumb = thumbFromVariant ? v.getImageUrl() : (p != null ? p.getThumbnailUrl() : null);
+            Boolean useFileUpload = thumbFromVariant ? v.getUseFileUpload() : (p != null ? p.getUseFileUpload() : null);
+            items.add(OrderDetailResponse.Item.from(oi, thumb, useFileUpload));
+        }
         List<OrderDetailResponse.History> history = historyRepo.findByOrderIdOrderByCreatedAtAsc(o.getId())
                 .stream().map(OrderDetailResponse.History::from).toList();
         return OrderDetailResponse.builder()
@@ -354,8 +361,14 @@ public class OrderService {
     }
 
     private String formatAddress(UserAddress a) {
-        return String.format("%s, %s, %s, %s",
-                a.getStreetAddress(), a.getWard(), a.getDistrict(), a.getProvince());
+        return java.util.stream.Stream.of(
+                        a.getStreetAddress(),
+                        a.getWard(),
+                        a.getDistrict(),
+                        a.getProvince()
+                )
+                .filter(s -> s != null && !s.isBlank())
+                .collect(java.util.stream.Collectors.joining(", "));
     }
 
     private String generateOrderCode() {
